@@ -890,6 +890,7 @@
 					"-all_load",
 				);
 				PRODUCT_NAME = UnitTest;
+				SYMROOT = ../../../../build;
 				WRAPPER_EXTENSION = octest;
 			};
 			name = Debug;
@@ -922,6 +923,7 @@
 				PREBINDING = NO;
 				PRODUCT_NAME = Sparrow;
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "8F2B7F7C-97B8-4A99-B7EE-104D609292F6";
+				SYMROOT = ../../../../build;
 			};
 			name = Debug;
 		};
