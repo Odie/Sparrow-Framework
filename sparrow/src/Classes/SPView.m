@@ -46,6 +46,7 @@
 @synthesize timer = mTimer;
 @synthesize displayLink = mDisplayLink;
 @synthesize frameRate = mFrameRate;
+@synthesize enableMsaa = mEnableMSAA;
 
 - (id)initWithFrame:(CGRect)frame 
 {    
@@ -114,6 +115,23 @@
     
     if(glCheckFramebufferStatusOES(GL_FRAMEBUFFER_OES) != GL_FRAMEBUFFER_COMPLETE_OES) 
         NSLog(@"failed to create framebuffer: %x", glCheckFramebufferStatusOES(GL_FRAMEBUFFER_OES));
+	
+	if(mEnableMSAA)
+	{
+		glGenFramebuffersOES(1, &mMsaaFramebuffer); 
+		glGenRenderbuffersOES(1, &mMsaaRenderbuffer);   
+		
+		glBindFramebufferOES(GL_FRAMEBUFFER_OES, mMsaaFramebuffer); 
+		glBindRenderbufferOES(GL_RENDERBUFFER_OES, mMsaaRenderbuffer);   
+		
+		glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER_OES, 4, GL_RGB5_A1_OES, mWidth, mHeight); 
+		glFramebufferRenderbufferOES(GL_FRAMEBUFFER_OES, GL_COLOR_ATTACHMENT0_OES, GL_RENDERBUFFER_OES, mMsaaRenderbuffer); 
+		glGenRenderbuffersOES(1, &mMsaaDepthbuffer);
+		
+		glBindRenderbufferOES(GL_RENDERBUFFER_OES, mMsaaDepthbuffer); 
+		glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER_OES, 4, GL_DEPTH_COMPONENT16_OES, mWidth , mHeight); 
+		glFramebufferRenderbufferOES(GL_FRAMEBUFFER_OES, GL_DEPTH_ATTACHMENT_OES, GL_RENDERBUFFER_OES, mMsaaDepthbuffer);
+	}
 }
 
 - (void)destroyFramebuffer 
@@ -138,12 +156,24 @@
     
     [EAGLContext setCurrentContext:mContext];
     
-    glBindFramebufferOES(GL_FRAMEBUFFER_OES, mFramebuffer);
+	GLuint framebuffer = mEnableMSAA ? mMsaaFramebuffer : mFramebuffer;
+    glBindFramebufferOES(GL_FRAMEBUFFER_OES, framebuffer);
     glViewport(0, 0, mWidth, mHeight);
     
     [mRenderSupport reset];
     [mStage render:mRenderSupport];
-    
+	
+	if(mEnableMSAA)
+	{
+		GLenum attachments[] = {GL_STENCIL_ATTACHMENT_OES}; 
+		glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, 1, attachments);
+		
+		glBindFramebufferOES(GL_READ_FRAMEBUFFER_APPLE, mMsaaFramebuffer); 
+		glBindFramebufferOES(GL_DRAW_FRAMEBUFFER_APPLE, mRenderbuffer);
+		
+		glResolveMultisampleFramebufferAPPLE();
+    }
+	
     glBindRenderbufferOES(GL_RENDERBUFFER_OES, mRenderbuffer);
     [mContext presentRenderbuffer:GL_RENDERBUFFER_OES];
     

@@ -42,6 +42,11 @@
     EAGLContext *mContext;    
     GLuint mRenderbuffer;
     GLuint mFramebuffer;    
+
+	BOOL mEnableMSAA;
+	GLuint mMsaaFramebuffer;
+	GLuint mMsaaDepthbuffer;
+	GLuint mMsaaRenderbuffer;
     
     float mFrameRate;
     NSTimer *mTimer;
@@ -64,6 +69,9 @@
 
 /// The stage object that will be processed.
 @property (nonatomic, retain) SPStage *stage;
+
+/// MSAA (fullscreen antialiasing) will be enabled.
+@property (nonatomic, assign) BOOL enableMsaa;
 
 /// -------------
 /// @name Methods
