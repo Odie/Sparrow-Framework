@@ -50,7 +50,7 @@
 
 - (id)initWithFrame:(CGRect)frame 
 {    
-    if ([super initWithFrame:frame]) 
+    if (self = [super initWithFrame:frame]) 
     {
         [self setup];
     }
@@ -59,7 +59,7 @@
 
 - (id)initWithCoder:(NSCoder *)decoder 
 {
-    if ([super initWithCoder:decoder]) 
+    if (self = [super initWithCoder:decoder]) 
     {
         [self setup];
     }

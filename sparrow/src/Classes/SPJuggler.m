@@ -37,13 +37,11 @@
     mElapsedTime += seconds;
     
     // we need work with a copy, since user-code could modify the collection during the enumeration
-	NSMutableArray* objects = [mObjects mutableCopy];
-    for (id<SPAnimatable> object in objects)    
+    for (id<SPAnimatable> object in [NSArray arrayWithArray:mObjects])
     {
         [object advanceTime:seconds];        
         if (object.isComplete) [self removeObject:object];
     }    
-	[objects release];
 }
  
 - (void)addObject:(id<SPAnimatable>)object
@@ -63,6 +61,11 @@
 }
 
 - (void)removeTweensWithTarget:(id)object
+{
+    [self removeObjectsWithTarget:object];
+}
+
+- (void)removeObjectsWithTarget:(id)object
 {
     SEL targetSel = @selector(target);
     NSMutableArray *remainingObjects = [[NSMutableArray alloc] init];
